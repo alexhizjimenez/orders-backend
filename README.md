@@ -130,6 +130,55 @@ Para facilitar las pruebas, la base de datos se crea en memoria y se puede inspe
 
 ---
 
+## 📖 Documentación de la API (Swagger / OpenAPI)
+
+La documentación interactiva y detallada de los endpoints de la API se genera automáticamente mediante **springdoc-openapi**:
+
+*   **Swagger UI URL:** [http://localhost:8081/swagger-ui/index.html](http://localhost:8081/swagger-ui/index.html)
+*   **OpenAPI JSON:** [http://localhost:8081/v3/api-docs](http://localhost:8081/v3/api-docs)
+
+### Ejemplo de Configuración/Anotaciones
+
+Para documentar los controladores y los objetos de petición (`dtoRequest`), se utilizaron anotaciones OpenAPI 3. A continuación se presenta un ejemplo de cómo se integraron:
+
+#### 1. DTO de Petición (`ProductRequest.java`)
+Se usa `@Schema` para documentar la estructura del DTO y proporcionar ejemplos reales:
+```java
+@Getter
+@Setter
+@Schema(description = "Modelo de petición para registrar un nuevo producto")
+public class ProductRequest {
+
+    @Schema(description = "Descripción o nombre del producto", example = "Monitor Dell 24 pulgadas")
+    private String description;
+
+    @Schema(description = "Precio unitario del producto", example = "180.00")
+    private Double price;
+}
+```
+
+#### 2. Controlador (`ProductController.java`)
+Se utiliza `@Tag` para agrupar endpoints, `@Operation` para describir la acción del endpoint y `@ApiResponse` para detallar las respuestas del servidor:
+```java
+@RestController
+@RequestMapping("/api/v1/products")
+@RequiredArgsConstructor
+@Tag(name = "Productos", description = "Endpoints para la gestión de productos")
+public class ProductController {
+
+    private final CreateProductUseCase createProductUseCase;
+
+    @PostMapping
+    @Operation(summary = "Crear un nuevo producto", description = "Registra un nuevo producto en el catálogo de la aplicación")
+    @ApiResponse(responseCode = "201", description = "Producto creado exitosamente", content = @Content(schema = @Schema(implementation = ProductResponse.class)))
+    public ResponseEntity<ProductResponse> createProduct(@Valid @RequestBody ProductRequest productRequest) {
+        // ...
+    }
+}
+```
+
+---
+
 ## 🌱 Datos de Prueba Sembrados (Seeding)
 
 Al iniciar la aplicación, la clase `DatabaseSeeder` inserta automáticamente los siguientes registros iniciales para pruebas:
