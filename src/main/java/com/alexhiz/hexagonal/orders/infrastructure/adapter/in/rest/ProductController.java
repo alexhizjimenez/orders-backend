@@ -32,7 +32,7 @@ public class ProductController {
     @Operation(summary = "Crear un nuevo producto", description = "Registra un nuevo producto en el catálogo de la aplicación")
     @ApiResponse(responseCode = "201", description = "Producto creado exitosamente", content = @Content(schema = @Schema(implementation = ProductResponse.class)))
     public ResponseEntity<ProductResponse> createProduct(@Valid @RequestBody ProductRequest productRequest) {
-        Product product = Product.builder().description(productRequest.getDescription()).price(productRequest.getPrice()).build();
+        Product product = Product.builder().description(productRequest.description()).price(productRequest.price()).build();
         Product create = createProductUseCase.createProduct(product);
         return ResponseEntity.status(HttpStatus.CREATED).body(ProductResponse.from(create));
     }

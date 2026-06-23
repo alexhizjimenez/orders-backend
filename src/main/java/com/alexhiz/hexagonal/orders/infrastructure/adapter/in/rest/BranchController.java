@@ -32,7 +32,7 @@ public class BranchController {
     @Operation(summary = "Crear una nueva sucursal", description = "Registra una nueva sucursal en el sistema")
     @ApiResponse(responseCode = "201", description = "Sucursal creada exitosamente", content = @Content(schema = @Schema(implementation = BranchResponse.class)))
     public ResponseEntity<BranchResponse> createBranch(@Valid @RequestBody BranchRequest branchRequest) {
-        Branch branch = Branch.builder().name(branchRequest.getName()).build();
+        Branch branch = Branch.builder().name(branchRequest.name()).build();
         Branch create = createBranchUseCase.createBranch(branch);
         return ResponseEntity.status(HttpStatus.CREATED).body(BranchResponse.from(create));
     }
