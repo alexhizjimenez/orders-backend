@@ -35,15 +35,15 @@ public class OrderController {
     @Operation(summary = "Crear un nuevo pedido", description = "Registra un nuevo pedido asociándolo a una sucursal y especificando la lista de productos y cantidades")
     @ApiResponse(responseCode = "201", description = "Pedido creado exitosamente", content = @Content(schema = @Schema(implementation = OrderResponse.class)))
     public ResponseEntity<OrderResponse> createOrder(@Valid @RequestBody OrderRequest orderRequest) {
-        List<OrderItem> domainItems = orderRequest.getItems().stream()
+        List<OrderItem> domainItems = orderRequest.items().stream()
                 .map(itemReq -> OrderItem.builder()
-                        .product(Product.builder().id(itemReq.getProductId()).build())
-                        .quantity(itemReq.getQuantity())
+                        .product(Product.builder().id(itemReq.productId()).build())
+                        .quantity(itemReq.quantity())
                         .build())
                 .collect(Collectors.toList());
 
         Order order = Order.builder()
-                .branchId(orderRequest.getBranchId())
+                .branchId(orderRequest.branchId())
                 .items(domainItems)
                 .build();
 

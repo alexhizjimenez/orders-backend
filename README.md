@@ -139,26 +139,23 @@ La documentación interactiva y detallada de los endpoints de la API se genera a
 
 ### Ejemplo de Configuración/Anotaciones
 
-Para documentar los controladores y los objetos de petición (`dtoRequest`), se utilizaron anotaciones OpenAPI 3. A continuación se presenta un ejemplo de cómo se integraron:
+Para documentar los controladores y los objetos de petición (`dtoRequest`), se utilizaron anotaciones OpenAPI 3. A continuación se presenta un ejemplo de cómo se integraron usando **Java Records**:
 
 #### 1. DTO de Petición (`ProductRequest.java`)
-Se usa `@Schema` para documentar la estructura del DTO y proporcionar ejemplos reales:
+Se usa `@Schema` directamente en los componentes del `record` para documentar la estructura y proporcionar ejemplos reales:
 ```java
-@Getter
-@Setter
 @Schema(description = "Modelo de petición para registrar un nuevo producto")
-public class ProductRequest {
-
+public record ProductRequest(
     @Schema(description = "Descripción o nombre del producto", example = "Monitor Dell 24 pulgadas")
-    private String description;
+    String description,
 
     @Schema(description = "Precio unitario del producto", example = "180.00")
-    private Double price;
-}
+    Double price
+) {}
 ```
 
 #### 2. Controlador (`ProductController.java`)
-Se utiliza `@Tag` para agrupar endpoints, `@Operation` para describir la acción del endpoint y `@ApiResponse` para detallar las respuestas del servidor:
+Se utiliza `@Tag` para agrupar endpoints, `@Operation` para describir la acción del endpoint y `@ApiResponse` para detallar las respuestas del servidor. Los accesores del `record` se invocan sin el prefijo `get` (por ejemplo, `productRequest.description()`):
 ```java
 @RestController
 @RequestMapping("/api/v1/products")
@@ -172,6 +169,10 @@ public class ProductController {
     @Operation(summary = "Crear un nuevo producto", description = "Registra un nuevo producto en el catálogo de la aplicación")
     @ApiResponse(responseCode = "201", description = "Producto creado exitosamente", content = @Content(schema = @Schema(implementation = ProductResponse.class)))
     public ResponseEntity<ProductResponse> createProduct(@Valid @RequestBody ProductRequest productRequest) {
+        Product product = Product.builder()
+                .description(productRequest.description())
+                .price(productRequest.price())
+                .build();
         // ...
     }
 }
